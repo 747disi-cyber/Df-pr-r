@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ВЕБ-КРАФТЕР - Создание сайтов на заказ</title>
+    <link rel="shortcut icon" href="Logo.png" type="png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .page-loader {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at top left, rgba(255, 127, 0, 0.22), transparent 28%),
+                        linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #ffffff;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .page-loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-content {
+            text-align: center;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .spinner {
+            width: 52px;
+            height: 52px;
+            border: 5px solid rgba(255, 255, 255, 0.18);
+            border-top-color: #ff7f00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .delay-1 { animation-delay: 0.15s; }
+        .delay-2 { animation-delay: 0.3s; }
+        .delay-3 { animation-delay: 0.45s; }
+        .delay-4 { animation-delay: 0.6s; }
+        .delay-5 { animation-delay: 0.75s; }
+        .delay-6 { animation-delay: 0.9s; }
+        .delay-7 { animation-delay: 1.05s; }
+        .delay-8 { animation-delay: 1.2s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 100px 60px 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 60px;
+            min-height: calc(100vh - 72px);
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-image img {
+            max-width: 500px;
+            width: 100%;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 18px 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #1a1a2e;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .navbar-logo img {
+            height: 40px;
+            width: auto;
+            display: block;
+        }
+
+        .navbar-links {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .navbar-links a {
+            color: #1a1a2e;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .navbar-links a:hover {
+            color: #667eea;
+        }
+
+        .hero-image img:hover {
+            transform: scale(1.05);
+        }
+
+        /* Services Section */
+        .services {
+            padding: 80px 60px;
+            background: white;
+            margin-top: 40px;
+        }
+
+        .services h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #1a1a2e;
+            margin-bottom: 60px;
+        }
+
+        .services-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .service-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            border-radius: 20px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-badge {
+            position: absolute;
+            top: 10px;
+            right: 18px;
+            background: #ff7f00;
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 8px 14px;
+            border-radius: 999px;
+            box-shadow: 0 10px 20px rgba(255, 127, 0, 0.25);
+            z-index: 1;
+        }
+
+        .service-card::before,
+        .service-card::after {
+            content: '';
+            position: absolute;
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            background-size: 200% 200%;
+        }
+
+        .service-card::before {
+            top: 0;
+            left: 0;
+            clip-path: polygon(0 0, 100% 0, 100% 25%, 25% 25%, 25% 100%, 0 100%);
+            transform: translate(-8px, -8px);
+        }
+
+        .service-card::after {
+            bottom: 0;
+            right: 0;
+            clip-path: polygon(100% 100%, 0 100%, 0 75%, 75% 75%, 75% 0, 100% 0);
+            transform: translate(8px, 8px);
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        .service-card:hover::before,
+        .service-card:hover::after {
+            opacity: 1;
+            animation: cornerShift 2.5s ease infinite alternate;
+        }
+
+        .service-card:hover::before {
+            transform: translate(0, 0);
+        }
+
+        .service-card:hover::after {
+            transform: translate(0, 0);
+        }
+
+        @keyframes cornerShift {
+            0% {
+                background-position: 0% 0%;
+            }
+            50% {
+                background-position: 100% 100%;
+            }
+            100% {
+                background-position: 0% 0%;
+            }
+        }
+
+        .service-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+
+        .service-card p {
+            font-size: 1rem;
+            margin-bottom: 30px;
+            flex-grow: 1;
+        }
+
+        .service-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .order-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            align-self: flex-start;
+        }
+
+        .service-card:nth-child(1) .order-btn {
+            color: #4facfe;
+        }
+        
+        .service-card:nth-child(2) .order-btn {
+            color: #4facfe;
+        }
+
+        .service-card:nth-child(3) .order-btn {
+            color: #4facfe;
+        }
+
+        .order-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .more-action {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .more-link {
+            color: #2b7cff;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 700;
+            transition: color 0.2s ease;
+        }
+
+        .more-link:hover {
+            color: #1a5fd8;
+        }
+
+        .pr-link {
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            transition: color 0.2s ease;
+        }
+
+        .extra-card {
+            grid-column: 1 / -1;
+            max-width: 620px;
+            margin: 0 auto;
+            justify-self: center;
+        }
+
+        .hidden-card {
+            display: none;
+        }
+
+        /* Clients Section */
+        .clients {
+            padding: 80px 60px;
+            background: white;
+            color: #1a1a2e;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .clients h2 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+        }
+
+        .clients p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+        }
+
+        /* Promo Section */
+        .promo {
+            padding: 100px 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            margin-top: 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+
+        .promo:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+
+        .promo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.05)"/><circle cx="80" cy="80" r="1.5" fill="rgba(255,255,255,0.08)"/></svg>') repeat;
+            opacity: 0.5;
+            animation: float 10s ease-in-out infinite;
+            transition: animation-duration 0.3s ease;
+        }
+
+        .promo:hover::before {
+            animation-duration: 5s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .promo h2 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            font-weight: 800;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .promo p {
+            font-size: 1.5rem;
+            opacity: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+
+        .promo .highlight {
+            color: #ff7f00;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* Footer */
+        .footer {
+            background: #000;
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .footer-content h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .footer-content p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .footer-contacts p {
+            margin-bottom: 10px;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .footer a:hover {
+            opacity: 0.8;
+        }
+
+        .footer-content small {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero {
+                padding: 80px 40px 40px;
+                gap: 40px;
+            }
+
+            .hero-text h1 {
+                font-size: 2.8rem;
+            }
+
+            .navbar-inner {
+                padding: 18px 40px;
+            }
+
+            .services {
+                padding: 60px 40px;
+            }
+
+            .clients {
+                padding: 60px 40px;
+            }
+
+            .promo {
+                padding: 80px 40px;
+            }
+
+            .promo h2 {
+                font-size: 2.5rem;
+            }
+
+            .promo p {
+                font-size: 1.3rem;
+            }
+
+            .footer {
+                padding: 50px 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+                padding: 40px 20px;
+                min-height: auto;
+            }
+
+            .hero-text h1 {
+                font-size: 2rem;
+                text-align: center;
+            }
+
+            .hero-image img {
+                max-width: 400px;
+            }
+
+            .navbar-inner {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .navbar-links {
+                gap: 20px;
+            }
+
+            .services {
+                padding: 40px 20px;
+            }
+
+            .services-container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .clients {
+                padding: 40px 20px;
+            }
+
+            .promo {
+                padding: 60px 20px;
+            }
+
+            .promo h2 {
+                font-size: 2.2rem;
+            }
+
+            .promo p {
+                font-size: 1.2rem;
+            }
+
+            .footer {
+                padding: 40px 20px;
+            }
+
+            .footer-content h3 {
+                font-size: 1.6rem;
+            }
+
+            .footer-content p {
+                font-size: 1rem;
+            }
+
+            .footer-contacts p {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-text h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero-image img {
+                max-width: 300px;
+            }
+
+            .services h2 {
+                font-size: 2rem;
+            }
+
+            .clients h2 {
+                font-size: 2rem;
+            }
+
+            .promo h2 {
+                font-size: 2rem;
+            }
+
+            .promo p {
+                font-size: 1rem;
+            }
+
+            .service-card {
+                padding: 30px;
+            }
+
+            .service-card h3 {
+                font-size: 1.3rem;
+            }
+
+            .service-price {
+                font-size: 1.3rem;
+            }
+
+            .order-btn {
+                padding: 10px 25px;
+                font-size: 0.9rem;
+            }
+
+            .footer-contacts p {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+    <noscript>
+        <meta http-equiv="refresh" content="0; url=no-js.html">
+    </noscript>
+</head>
+<body>
+    <div class="page-loader" id="page-loader">
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <p>Загрузка...</p>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <header class="navbar reveal">
+        <div class="navbar-inner">
+            <a class="navbar-logo" href="#home">
+                <img src="Logo-no-bg.png" alt="Логотип компании">
+            </a>
+            <nav class="navbar-links">
+                <a href="#services">Наши услуги</a>
+                <a href="#clients">Наши клиенты</a>
+                <a href="#promo">Акции</a>
+                <a href="#contacts">Контакты</a>
+            </nav>
+        </div>
+    </header>
+
+    <section id="home" class="hero reveal">
+        <div class="hero-text reveal">
+            <h1>Создание сайтов на заказ</h1>
+        </div>
+        <div class="hero-image reveal">
+            <img src="Logo.png" alt="Логотип компании">
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services reveal">
+        <h2 class="reveal">Наши услуги</h2>
+        <div class="services-container">
+            <!-- Service 1 -->
+            <div class="service-card reveal">
+                <div>
+                    <h3>Лендинговая страница</h3>
+                    <p>Сайт-визитка, одностраничный сайт для вашего бизнеса</p>
+                    <div class="service-price">от 30 000 ₽</div>
+                </div>
+                <button class="order-btn">Заказать</button>
+            </div>
+
+            <!-- Service 2 -->
+            <div class="service-card reveal">
+                <div class="service-badge">Хит 🔥</div>
+                <div>
+                    <h3>Многостраничный сайт</h3>
+                    <p>Полнофункциональный сайт для развития вашего бизнеса. <a href="#promo" class="pr-link">Акция</a></p>
+                    <div class="service-price">от 60 000 ₽</div>
+                </div>
+                <button class="order-btn">Заказать</button>
+            </div>
+
+            <!-- Service 3 -->
+            <div class="service-card reveal">
+                <div>
+                    <h3>Интернет-магазин</h3>
+                    <p>Сайт с авторизацией, сложный сайт под вашу задачу</p>
+                    <div class="service-price">от 80 000 ₽</div>
+                </div>
+                <button class="order-btn">Заказать</button>
+            </div>
+
+            <!-- Extra Service Card -->
+            <div class="service-card extra-card reveal hidden-card">
+                <div>
+                    <h3>Любой другой сайт</h3>
+                    <p>Индивидуальный сайт под любую задачу: от уникального брендинга до сложной онлайн-системы.</p>
+                    <div class="service-price">Цена договорная</div>
+                </div>
+                <button class="order-btn">Написать нам</button>
+            </div>
+        </div>
+        <div class="more-action">
+                <a id="show-more" href="#" class="more-link">Узнать ещё</a>
+    </section>
+
+    <!-- Clients Section -->
+    <section id="clients" class="clients reveal">
+        <h2 class="reveal">Наши клиенты</h2>
+        <p class="reveal">Большие компании, малый и средний бизнес, а ещё ИП</p>
+    </section>
+
+        <!-- Promo Section -->
+    <section id="promo" class="promo reveal">
+        <h2 class="reveal">Акция</h2>
+        <p class="reveal">При покупке услуги создания многостраничного сайта вы получите <span class="highlight">бесплатное обслуживание на 3 месяца</span>!</p>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contacts" class="footer reveal">
+        <div class="footer-content">
+            <h3>ВЕБ-КРАФТЕР</h3>
+            <p>Создание сайтов на заказ</p>
+            <div class="footer-contacts">
+                <p><a href="tel:+79999999999">+7 999 999 99 99</a></p>
+                <p><a href="mailto:mail@web-crafter.ru">mail@web-crafter.ru</a></p>
+            </div>
+            <small>Данный сайт не продаёт никаких услуг, всё изложенное выше выдуманно</small>
+        </div>
+    </footer>
+
+    <script>
+        window.addEventListener('load', function () {
+            window.scrollTo(0, 0);
+
+            var loader = document.getElementById('page-loader');
+            setTimeout(function () {
+                if (loader) {
+                    loader.classList.add('hidden');
+                }
+            }, 500);
+
+            var revealElements = document.querySelectorAll('.reveal');
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.15
+            });
+
+            revealElements.forEach(function(el) {
+                observer.observe(el);
+            });
+
+            var showMoreBtn = document.getElementById('show-more');
+            var extraCard = document.querySelector('.extra-card');
+
+            if (showMoreBtn && extraCard) {
+                showMoreBtn.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    if (extraCard.classList.contains('hidden-card')) {
+                        extraCard.classList.remove('hidden-card');
+                        setTimeout(function() {
+                            extraCard.classList.add('visible');
+                            extraCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 20);
+                        showMoreBtn.textContent = 'Скрыть';
+                    } else {
+                        extraCard.classList.remove('visible');
+                        setTimeout(function() {
+                            extraCard.classList.add('hidden-card');
+                        }, 300);
+                        showMoreBtn.textContent = 'Узнать ещё';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
